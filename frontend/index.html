@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Register · Krishna Engineering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css?v=9">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-mark">KE</span>
+        <div class="logo-text">
+          <span class="logo-title">Krishna Engineering</span>
+          <span class="logo-sub">Attendance Management System</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="prev-toggle-btn" onclick="togglePrevSection()">Previous Registers</button>
+        <button class="pending-toggle-btn hidden" id="pending-toggle-btn" onclick="togglePendingSection()">Pending Approvals</button>
+        <div class="user-chip hidden" id="user-chip"></div>
+        <a class="logout-link hidden" id="logout-link" href="/auth/logout">Logout</a>
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          <span>v2.0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PREVIOUS REGISTERS (loaded on page load) -->
+    <section id="prev-section" class="section hidden">
+      <div class="section-label">HISTORY</div>
+      <h2 class="section-title">Previous Attendance Registers</h2>
+      <div id="prev-registers-list" class="prev-registers-list"></div>
+    </section>
+
+    <section id="pending-section" class="section hidden">
+      <div class="section-label">APPROVALS</div>
+      <h2 class="section-title">Pending Register Approvals</h2>
+      <div id="pending-registers-list" class="prev-registers-list"></div>
+    </section>
+
+    <!-- UPLOAD SECTION -->
+    <section id="upload-section" class="section">
+      <div class="section-label">01 — UPLOAD FILES</div>
+      <h1 class="section-title">Generate Attendance Register</h1>
+      <p class="section-desc">Upload the monthly punch PDF and leave balance sheet to generate a fully formatted Excel attendance register for all employees and labour.</p>
+
+      <div class="upload-grid">
+
+        <!-- PDF Upload -->
+        <div class="upload-card" id="pdf-card">
+          <div class="upload-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="2" width="18" height="24" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M18 2v8h8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M22 10l4-4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 14h10M8 18h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="upload-info">
+            <div class="upload-label">Punch Data</div>
+            <div class="upload-hint">ONtime Secureye export · .pdf</div>
+          </div>
+          <input type="file" id="pdf-input" accept=".pdf" hidden>
+          <button class="upload-btn" onclick="document.getElementById('pdf-input').click()">
+            <span id="pdf-btn-text">Choose PDF</span>
+          </button>
+          <div class="upload-filename" id="pdf-filename"></div>
+        </div>
+
+        <!-- XLSX Upload -->
+        <div class="upload-card" id="xlsx-card">
+          <div class="upload-icon">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="2" width="18" height="24" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M18 2v8h8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M22 10l4-4" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="7" y="14" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.2"/>
+              <rect x="13" y="14" width="4" height="4" rx="0.5" stroke="currentColor" stroke-width="1.2"/>
+              <rect x="7" y="20" width="4" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/>
+              <rect x="13" y="20" width="4" height="3" rx="0.5" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <div class="upload-info">
+            <div class="upload-label">Leave Balance Sheet</div>
+            <div class="upload-hint">Employee & leave data · .xlsx</div>
+          </div>
+          <input type="file" id="xlsx-input" accept=".xlsx,.xls" hidden>
+          <button class="upload-btn" onclick="document.getElementById('xlsx-input').click()">
+            <span id="xlsx-btn-text">Choose XLSX</span>
+          </button>
+          <div class="upload-filename" id="xlsx-filename"></div>
+        </div>
+
+      </div>
+
+      <button class="process-btn" id="process-btn" onclick="processFiles()" disabled>
+        <span id="process-text">Process Files</span>
+        <span class="process-arrow">→</span>
+        <div class="btn-loader hidden" id="btn-loader"></div>
+      </button>
+
+      <div class="upload-divider">
+        <span></span>
+        <strong>OR</strong>
+        <span></span>
+      </div>
+
+      <div class="upload-card register-upload-card" id="register-card">
+        <div class="upload-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="2" width="20" height="26" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M9 10h10M9 15h14M9 20h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M22 6l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="upload-info">
+          <div class="upload-label">Generated Attendance Register</div>
+          <div class="upload-hint">Previously downloaded calculated workbook · .xlsx</div>
+        </div>
+        <input type="file" id="register-input" accept=".xlsx,.xls" hidden>
+        <button class="upload-btn" onclick="document.getElementById('register-input').click()">
+          <span id="register-btn-text">Choose Register</span>
+        </button>
+        <div class="upload-filename" id="register-filename"></div>
+      </div>
+
+      <button class="process-btn import-register-btn" id="import-register-btn" onclick="importRegisterFile()" disabled>
+        <span id="import-register-text">Load Register</span>
+        <span class="process-arrow">→</span>
+        <div class="btn-loader hidden" id="import-loader"></div>
+      </button>
+
+      <div id="error-box" class="error-box hidden"></div>
+    </section>
+
+    <!-- RESULTS SECTION -->
+    <section id="results-section" class="section hidden">
+      <div class="section-label">02 — RESULTS</div>
+      <h2 class="section-title" id="results-title">Processing Complete</h2>
+
+      <!-- Stats bar -->
+      <div class="stats-bar" id="stats-bar"></div>
+
+      <!-- Employee cards -->
+      <div class="emp-grid" id="emp-grid"></div>
+
+      <!-- Download zone -->
+      <div class="download-zone" id="download-zone">
+        <div class="download-left">
+          <div class="download-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M14 4v14M8 12l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 22h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="download-title">Attendance Register · Excel</div>
+            <div class="download-sub" id="download-sub">Complete workbook · all employees · all formulas live</div>
+          </div>
+        </div>
+        <div class="download-actions">
+          <button class="accept-btn hidden" id="accept-btn" onclick="acceptChanges()">
+            <span id="accept-btn-text">Accept Changes</span>
+            <div class="btn-loader hidden" id="accept-loader"></div>
+          </button>
+          <button class="download-btn" id="download-btn">Download .xlsx</button>
+        </div>
+      </div>
+
+      <!-- Freeze zone — separate final action -->
+      <div class="freeze-zone" id="freeze-zone">
+        <div class="freeze-zone-left">
+          <div class="freeze-zone-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="9" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 9V6.5a3 3 0 1 1 6 0V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="freeze-zone-title" id="freeze-zone-title">Freeze Register</div>
+            <div class="freeze-zone-sub" id="freeze-zone-sub">Lock and store this register permanently in the local database</div>
+          </div>
+        </div>
+        <button class="freeze-btn" id="freeze-btn" onclick="openFreezeModal()">
+          Freeze Register
+        </button>
+      </div>
+
+      <div class="submit-zone hidden" id="submit-zone">
+        <div class="freeze-zone-left">
+          <div class="freeze-zone-icon">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 10h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M9 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 4v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="freeze-zone-title" id="submit-zone-title">Submit for Approval</div>
+            <div class="freeze-zone-sub" id="submit-zone-sub">Send this register to an admin for final freezing</div>
+          </div>
+        </div>
+        <button class="submit-btn" id="submit-btn" onclick="submitForApproval()">
+          <span id="submit-btn-text">Submit for Approval</span>
+          <div class="btn-loader hidden" id="submit-loader"></div>
+        </button>
+      </div>
+
+      <button class="reset-btn" onclick="resetUI()">← Process Another Month</button>
+    </section>
+
+  </main>
+
+  <!-- FREEZE CONFIRMATION MODAL -->
+  <div class="modal-overlay hidden" id="freeze-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Freeze Register</div>
+        <button class="modal-close" onclick="closeFreezeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">This will permanently store the attendance register in the local database. It can be accessed later from <strong>Previous Registers</strong>.</p>
+        <div class="modal-summary" id="freeze-modal-summary"></div>
+        <div class="modal-warn" id="freeze-modal-warn"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeFreezeModal()">Cancel</button>
+        <button class="modal-confirm" id="freeze-confirm-btn" onclick="confirmFreeze()">
+          <span id="freeze-confirm-text">Freeze Register</span>
+          <div class="btn-loader hidden" id="freeze-loader"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast hidden" id="toast"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>Krishna Engineering Attendance System</span>
+    <span class="footer-sep">·</span>
+    <span>Built with FastAPI + openpyxl + SQLite</span>
+  </footer>
+
+  <script src="/static/js/app.js?v=9"></script>
+</body>
+</html>

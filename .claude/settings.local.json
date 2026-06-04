@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"from backend.parser import parse_xlsx_meta, _resolve_week_off; from backend.processor import build_attendance_workbook, rebuild_from_json; print\\('OK'\\)\")",
+      "Bash(python3 -c \"from backend.main import app; print\\('Backend OK'\\)\")",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(pkill -f \"uvicorn main:app\")",
+      "Bash(nohup python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload)",
+      "Bash(echo \"Server PID: $!\")",
+      "Bash(sleep 3 && tail -20 /tmp/server.log)",
+      "Bash(pkill -f \"uvicorn\")",
+      "Bash(python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(pkill -f \"uvicorn\" 2>/dev/null; sleep 1 && python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload > /tmp/server.log 2>&1 & *)",
+      "Bash(kill -9 20582 50115 65145)",
+      "Bash(curl -s http://localhost:8000/registers)",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost:8000/api/registers)",
+      "Bash(curl -s http://localhost:8000/api/registers/1)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}
