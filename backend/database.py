@@ -122,17 +122,24 @@ def init_db():
 
 
 def upsert_user(email: str, name: str = "", picture: str = "",
-                default_role: str = "maker", admin_emails=None) -> dict:
+                default_role: str = "maker", admin_emails=None,
+                maker_emails=None) -> dict:
     email = (email or "").strip().lower()
     if not email:
         raise ValueError("Email is required")
     admin_emails = {e.strip().lower() for e in (admin_emails or []) if e.strip()}
+    maker_emails = {e.strip().lower() for e in (maker_emails or []) if e.strip()}
     now = datetime.now().isoformat()
     c = _conn()
     try:
         row = c.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
         if row:
-            role = "admin" if email in admin_emails else row["role"]
+            if email in admin_emails:
+                role = "admin"
+            elif email in maker_emails:
+                role = "maker"
+            else:
+                role = row["role"]
             c.execute(
                 """UPDATE users
                    SET name=?, picture=?, role=?, last_login=?
@@ -141,7 +148,12 @@ def upsert_user(email: str, name: str = "", picture: str = "",
             )
         else:
             existing_count = c.execute("SELECT COUNT(*) AS n FROM users").fetchone()["n"]
-            role = "admin" if email in admin_emails or existing_count == 0 else default_role
+            if email in admin_emails:
+                role = "admin"
+            elif email in maker_emails:
+                role = "maker"
+            else:
+                role = "admin" if existing_count == 0 else default_role
             c.execute(
                 """INSERT INTO users (email, name, picture, role, created_at, last_login)
                    VALUES (?,?,?,?,?,?)""",

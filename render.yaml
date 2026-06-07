@@ -17,3 +17,5 @@ services:
         sync: false
       - key: ADMIN_EMAILS
         sync: false
+      - key: MAKER_EMAILS
+        sync: false

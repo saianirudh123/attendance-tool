@@ -1,5 +1,4 @@
 import os
-from functools import wraps
 from typing import Optional
 
 from authlib.integrations.starlette_client import OAuth
@@ -14,14 +13,23 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "change-me-in-production")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
-ALLOWED_GOOGLE_DOMAINS = {
+DEFAULT_ALLOWED_GOOGLE_DOMAINS = {"krishna-engineering.com"}
+ALLOWED_GOOGLE_DOMAINS = DEFAULT_ALLOWED_GOOGLE_DOMAINS | {
     d.strip().lower()
     for d in os.getenv("ALLOWED_GOOGLE_DOMAINS", "").split(",")
     if d.strip()
 }
-ADMIN_EMAILS = {
+DEFAULT_ADMIN_EMAILS = {"saianirudh@krishna-engineering.com"}
+DEFAULT_MAKER_EMAILS = {"accounts@krishna-engineering.com"}
+
+ADMIN_EMAILS = DEFAULT_ADMIN_EMAILS | {
     e.strip().lower()
     for e in os.getenv("ADMIN_EMAILS", "").split(",")
+    if e.strip()
+}
+MAKER_EMAILS = DEFAULT_MAKER_EMAILS | {
+    e.strip().lower()
+    for e in os.getenv("MAKER_EMAILS", "").split(",")
     if e.strip()
 }
 
@@ -78,6 +86,7 @@ def login_user(request: Request, profile: dict) -> dict:
         name=profile.get("name") or email,
         picture=profile.get("picture") or "",
         admin_emails=ADMIN_EMAILS,
+        maker_emails=MAKER_EMAILS,
     )
     request.session["user_email"] = user["email"]
     return user

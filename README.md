@@ -29,6 +29,7 @@ Required for Google OAuth:
 - `GOOGLE_CLIENT_SECRET`
 - `ALLOWED_GOOGLE_DOMAINS` — optional comma-separated Workspace domains
 - `ADMIN_EMAILS` — optional comma-separated admin emails
+- `MAKER_EMAILS` — optional comma-separated maker emails
 
 In Google Cloud Console, create an OAuth Web Client and add this authorized redirect URI:
 
@@ -68,7 +69,15 @@ The app now requires Google login.
 - **Admin** users can do everything Makers can do, plus review pending approvals and freeze registers.
 - The first user who signs in becomes an admin automatically.
 - Emails listed in `ADMIN_EMAILS` are always admins.
+- Emails listed in `MAKER_EMAILS` are always makers.
 - All other new users are Makers by default.
+
+Current built-in role defaults:
+
+| Email | Role |
+|-------|------|
+| saianirudh@krishna-engineering.com | Admin |
+| accounts@krishna-engineering.com | Maker |
 
 ---
 
